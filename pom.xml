@@ -70,6 +70,8 @@
 
 			</plugin>
 		</plugins>
+
+		<finalName>vendor-analytics</finalName>
 	</build>
 
 </project>
