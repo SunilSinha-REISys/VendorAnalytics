@@ -1,5 +1,7 @@
 package com.java.model;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,18 +9,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 
 @Entity
 @Table(name = "contracts_data_aggregated_by_vendor_naics_psc" ,schema = "vendordb")
 
 public class ContractsDataAggregatedByVendorNaicsPsc {
-	    @Id
-	    @GeneratedValue(strategy= GenerationType.IDENTITY)
-	    private int vendorDunsNumber;
+	
+	 @Id
+		@GeneratedValue(strategy= GenerationType.IDENTITY)
+		private Integer id;
+	 
+	    @Column
+	    private Integer vendorDunsNumber;
 	   @Column
 	    private String naicsCode;
 	    @Column
@@ -38,21 +40,28 @@ public class ContractsDataAggregatedByVendorNaicsPsc {
 	    @Column
 	    private String vendorAddressZipCode;
 	    @Column
-	    private double totalObligatedAmount;
+	    private BigDecimal totalObligatedAmount;
 	    @Column
 	    private int totalNumberOfActions;
-		
 	    
-	    public ContractsDataAggregatedByVendorNaicsPsc() {}
 	    
-	   
-
-		public ContractsDataAggregatedByVendorNaicsPsc(int vendorDunsNumber, String naicsCode,
+	    
+	    
+	    
+	    public Integer getId() {
+			return id;
+		}
+		public void setId(Integer id) {
+			this.id = id;
+		}
+		public ContractsDataAggregatedByVendorNaicsPsc() {}
+		public ContractsDataAggregatedByVendorNaicsPsc(Integer id, Integer vendorDunsNumber, String naicsCode,
 				String productOrServiceCode, String vendorName, String naicsDescription,
 				String productOrServiceDescription, String vendorAddressLine_1, String vendorAddressCity,
-				String vendorAddressStateName, String vendorAddressZipCode, double totalObligatedAmount,
+				String vendorAddressStateName, String vendorAddressZipCode, BigDecimal totalObligatedAmount,
 				int totalNumberOfActions) {
 			super();
+			this.id = id;
 			this.vendorDunsNumber = vendorDunsNumber;
 			this.naicsCode = naicsCode;
 			this.productOrServiceCode = productOrServiceCode;
@@ -69,10 +78,12 @@ public class ContractsDataAggregatedByVendorNaicsPsc {
 
 
 
-		public int getVendorDunsNumber() {
+
+
+		public Integer getVendorDunsNumber() {
 			return vendorDunsNumber;
 		}
-		public void setVendorDunsNumber(int vendorDunsNumber) {
+		public void setVendorDunsNumber(Integer vendorDunsNumber) {
 			this.vendorDunsNumber = vendorDunsNumber;
 		}
 		public String getNaicsCode() {
@@ -129,10 +140,10 @@ public class ContractsDataAggregatedByVendorNaicsPsc {
 		public void setVendorAddressZipCode(String vendorAddressZipCode) {
 			this.vendorAddressZipCode = vendorAddressZipCode;
 		}
-		public double getTotalObligatedAmount() {
+		public BigDecimal getTotalObligatedAmount() {
 			return totalObligatedAmount;
 		}
-		public void setTotalObligatedAmount(double totalObligatedAmount) {
+		public void setTotalObligatedAmount(BigDecimal totalObligatedAmount) {
 			this.totalObligatedAmount = totalObligatedAmount;
 		}
 		public int getTotalNumberOfActions() {

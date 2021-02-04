@@ -32,203 +32,170 @@ import com.java.model.ContractsTransactionData;
 import com.java.model.NaicsCodeData;
 import com.java.model.OpportunityVendorsPp;
 import com.java.model.ProductServiceCodeData;
-import com.java.service.ContractsDataAggregatedByVendorNaicsPscService;
 
 @RestController
-@RequestMapping("/api/vendors")
+@RequestMapping("/api")
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class VendorDashaboardController {
 	@Autowired
-	private ContractsDataAggregatedByVendorNaicsPscRepository vendorNaicsPscDao;
-	 @Autowired
-	 private ContractsDataAggregatedByVendorNaicsPscService vendorNaicsPscService;
-	 
-	 @Autowired
-	 NaicsCodeDataRepository naicsCodeDataRepository ;
-	 
-	 @Autowired
-	 ContractsTransactionDataRepository contractsTransactionDataRepository ;
-		 
-	 @Autowired
-    public ProductServiceCodeDataRepository productServiceCodeDataRepository ;
-	 
-	 
-	 @Autowired
-	 public OpportunityVendorsPpRepository opportunityVendorsPpRepository ;
-	 
-	 public  List<NaicsCodeData>  naicsCodeDataAllList = new ArrayList<NaicsCodeData>();
-	 
-	 //public  List<NaicsCodeData>  naicsCodeDataAllList1 = new ArrayList<NaicsCodeData>();
-	 
-	 public  List<ProductServiceCodeData> productServiceCodeDataList = new ArrayList<ProductServiceCodeData>();
-	
-	 public   List<ContractsDataAggregatedByVendorNaicsPsc> vendorNaicsPscList = new ArrayList<ContractsDataAggregatedByVendorNaicsPsc>();
-	 
-	 public   List<ContractsTransactionData> contractsTransactionDataList = new ArrayList<ContractsTransactionData>();
-	 
-	 public   List<OpportunityVendorsPp> opportunityVendorsPpList = new ArrayList<OpportunityVendorsPp>();
-	 
-	
-	 @GetMapping("/{id}")
-	    public ResponseEntity<Map<String, Object>> getVendorDetails(@PathVariable Integer id){
-		 
-		   try {
-	
-		   // fetching vendor  data in order to duns number
-		      vendorNaicsPscList = vendorNaicsPscService.findAllByVendorDunsNumber(id) ;
-		      
-		      
-		      
-		     
-			   
-			   
-			  // vendorNaicsPscList = ContractsDataAggregatedByVendorNaicsPscRepository.findByVendorDunsNumber(id) ;
-		      
-		         
-		      //vendorNaicsPscList.stream().map(e -> e.getNaicsCode()).distinct().forEach(e -> System.out.print(e));
-		   
-		      
-		      
-		      
-		      
-		      
-		      // fetching naics data to vendor
-				  List<String> naicsCodeList= vendorNaicsPscList.parallelStream().map(
-				  ContractsDataAggregatedByVendorNaicsPsc::getNaicsCode).distinct().collect(Collectors.toList()); 
-				  naicsCodeDataAllList =naicsCodeDataRepository.findAll(); 
-				  naicsCodeList.forEach(naicsCode -> {
-				  naicsCodeDataAllList = naicsCodeDataAllList.stream().filter(e ->
-				  e.getNaicsCode().equals(naicsCode)).filter( distinctByKey(p ->
-				  p.getNaicsCode()) ).collect(Collectors.toList());
-				  
-				  });
-				 
-				 
-		    //  ProductServiceCodeData  
-			  productServiceCodeDataList = productServiceCodeDataRepository.findAll();
-			  List<String> productServiceCodeList= vendorNaicsPscList.parallelStream().map(
-			  ContractsDataAggregatedByVendorNaicsPsc::getProductOrServiceCode).distinct().
-			  collect(Collectors.toList());
-			  productServiceCodeList.forEach(productServiceCode -> {
-			  productServiceCodeDataList = productServiceCodeDataList.stream().filter(e ->
-			  e.getPscCode().equals(productServiceCode)).filter( distinctByKey(p ->
-			  p.getPscCode()) ).collect(Collectors.toList());
-			  
-			  });
-			  
-			  // contract transcation data
-			     contractsTransactionDataList = contractsTransactionDataRepository.findByVendorDunsNumber(id) ;
-			     Map<Integer, Long> countTotalAwards=contractsTransactionDataList.stream().collect(Collectors.groupingBy(ContractsTransactionData::getVendorDunsNumber,Collectors.counting()));
-				 List<String>  ContractAgencyName =  contractsTransactionDataList.stream().filter(e -> e.getVendorDunsNumber().equals(id)).map(ContractsTransactionData::getContractingAgencyName).collect(Collectors.toList());   
-				 ContractAgencyName = ContractAgencyName.stream().filter( distinctByKey(p ->p.toString()) ).collect(Collectors.toList());
-				
-				// rating
-				 
-				 
-				  String  vendorDunsNumberStr =Integer.toString(id); 
-				  opportunityVendorsPpList=opportunityVendorsPpRepository.findByEntityId(vendorDunsNumberStr) ;
-				 
-				 // generate Response
-				 Map<String, Object> response = new HashMap<>();
-				 response.put("vendors", vendorNaicsPscList);
-			  	 response.put("naics", naicsCodeDataAllList);
-			     response.put("psc", productServiceCodeDataList);
-			     response.put("totalAward",countTotalAwards.get(id));
-			     response.put("agencyName", ContractAgencyName);
-			     response.put("rating", opportunityVendorsPpList);
-			 
-			   return new ResponseEntity<>(response, HttpStatus.OK);
-			   
-			 } catch (Exception e) {
-				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-	    }
-		
-	   
-	   
-	   
-		@GetMapping("")
-		public ResponseEntity<Map<String, Object>> getVendors(@RequestParam(defaultValue = "0") Integer pageNo,
-				@RequestParam(defaultValue = "10") Integer pageSize, @RequestParam(required = false) String title) {
+	private ContractsDataAggregatedByVendorNaicsPscRepository contractsDataAggregatedByVendorNaicsPscRepository;
+	@Autowired
+	NaicsCodeDataRepository naicsCodeDataRepository;
 
-			try {
-				List<ContractsDataAggregatedByVendorNaicsPsc> vendorNaicsPscList = new ArrayList<ContractsDataAggregatedByVendorNaicsPsc>();
-				Pageable paging = PageRequest.of(pageNo, pageSize);
+	@Autowired
+	ContractsTransactionDataRepository contractsTransactionDataRepository;
 
-				Page<ContractsDataAggregatedByVendorNaicsPsc> pageVendorNaicsPsc;
+	@Autowired
+	public ProductServiceCodeDataRepository productServiceCodeDataRepository;
+	@Autowired
+	public OpportunityVendorsPpRepository opportunityVendorsPpRepository;
 
-				pageVendorNaicsPsc = vendorNaicsPscDao.findAll(paging);
+	public List<NaicsCodeData> naicsCodeDataList = new ArrayList<NaicsCodeData>();
 
-				vendorNaicsPscList = pageVendorNaicsPsc.getContent();
-				
-				
-				   //OpportunityVendorsPp
-				
-			      //List<Integer> vendorDunsNumberList =	vendorNaicsPscList.stream().map(e->e.getVendorDunsNumber()).collect(Collectors.toList()) ;
-				
-			      // System.out.println("-------------vendorDunsNumberList---------------------------"+vendorDunsNumberList);
-			      
-			     //   8016958
-			      
-			      //1307495  835551474 794571448
-			      
-			    // System.out.println("---------11--opportunityVendorsPpList---------------"+opportunityVendorsPpRepository.findByEntityId("794571448"));
-					
-			      
-				
-				/*
-				 * for(Integer vendorDunsNumber :vendorDunsNumberList) { String
-				 * vendorDunsNumberStr =Integer.toString(vendorDunsNumber); //
-				 * System.out.println("-----------vendorDunsNumberStr---------------"+
-				 * vendorDunsNumberStr);
-				 * 
-				 * //
-				 * opportunityVendorsPpRepository.findByEntityId(vendorDunsNumberStr).forEach(e-
-				 * > System.out.print("  "+ e.getRating()+ "----------"+
-				 * e.getPpCategoryCode()));
-				 * 
-				 * opportunityVendorsPpList=opportunityVendorsPpRepository.findByEntityId(
-				 * vendorDunsNumberStr) ;
-				 * 
-				 * }
-				 */
-				 
-			     // System.out.println("-----------1307495---------------");
-			        
-			     // opportunityVendorsPpList.stream().filter(e -> e.getEntityId().equals("1307495")).forEach(b-> System.out.println(b));
-			      
-			    //  opportunityVendorsPpList =opportunityVendorsPpRepository.findByEntityId("1307495") ;
-			    
-			        
-			    //  System.out.println("-----------opportunityVendorsPpList---------------"+opportunityVendorsPpList);
-				
-                  
-				Map<String, Object> response = new HashMap<>();
-				response.put("vendors", vendorNaicsPscList);
-				response.put("currentPage", pageVendorNaicsPsc.getNumber());
-				response.put("totalItems", pageVendorNaicsPsc.getTotalElements());
-				response.put("totalPages", pageVendorNaicsPsc.getTotalPages());
-				//response.put("rating", opportunityVendorsPpList);
-				
-				
-                    
-				vendorNaicsPscList= null ;
-				opportunityVendorsPpList = null ;
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			} catch (Exception e) {
-				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+	public List<NaicsCodeData> naicsCodeDataListAll = new ArrayList<NaicsCodeData>();
+
+	public List<ProductServiceCodeData> productServiceCodeDataList = new ArrayList<ProductServiceCodeData>();
+	public List<ProductServiceCodeData> pscCodeDataListAll = new ArrayList<ProductServiceCodeData>();
+
+	public List<ContractsDataAggregatedByVendorNaicsPsc> vendorList = new ArrayList<ContractsDataAggregatedByVendorNaicsPsc>();
+
+	public List<List<ContractsDataAggregatedByVendorNaicsPsc>> vendorNaicsPscListAll = new ArrayList<List<ContractsDataAggregatedByVendorNaicsPsc>>();
+
+	public List<ContractsTransactionData> contractsTransactionDataList = new ArrayList<ContractsTransactionData>();
+
+	public List<OpportunityVendorsPp> ratingList = new ArrayList<OpportunityVendorsPp>();
+
+	// all vendors
+	//--------------------------------------------------------------------------------------------------------
+	@GetMapping("/vendors")
+	public ResponseEntity<Map<String, Object>> getVendors(@RequestParam(defaultValue = "0") Integer pageNo,
+			@RequestParam(defaultValue = "10") Integer pageSize, @RequestParam(required = false) String title) {
+
+		try {
+			List<ContractsDataAggregatedByVendorNaicsPsc> vendorNaicsPscList = new ArrayList<ContractsDataAggregatedByVendorNaicsPsc>();
+			Pageable paging = PageRequest.of(pageNo, pageSize);
+			Page<ContractsDataAggregatedByVendorNaicsPsc> pageVendorNaicsPsc;
+			pageVendorNaicsPsc = contractsDataAggregatedByVendorNaicsPscRepository.findAll(paging);
+			vendorNaicsPscList = pageVendorNaicsPsc.getContent();
+			Map<String, Object> response = new HashMap<>();
+			response.put("vendors", vendorNaicsPscList);
+			response.put("currentPage", pageVendorNaicsPsc.getNumber());
+			response.put("totalItems", pageVendorNaicsPsc.getTotalElements());
+			response.put("totalPages", pageVendorNaicsPsc.getTotalPages());
+			vendorNaicsPscList = null;
+
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-	   
-	   
-	    //Utility function
-	    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) 
-	    {
-	        Map<Object, Boolean> map = new ConcurrentHashMap<>();
-	        return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-	    }
+	}
+
+	// vendor based on duns
+	// number--------------------------------------------------------------------------------------------
+	@GetMapping("/vendor/{id}")
+	public ResponseEntity<Map<String, Object>> getVendor(@PathVariable Integer id) {
+
+		try {
+			vendorList = null;
+			vendorList = contractsDataAggregatedByVendorNaicsPscRepository.findByVendorDunsNumber(id);
+
+			// count total award contract transcation data
+			contractsTransactionDataList = contractsTransactionDataRepository.findByVendorDunsNumber(id);
+			Map<Integer, Long> countTotalAwards = contractsTransactionDataList.stream().collect(
+					Collectors.groupingBy(ContractsTransactionData::getVendorDunsNumber, Collectors.counting()));
+			// List<String> contractAgencyName =
+			// contractsTransactionDataList.stream().filter(e ->
+			// e.getVendorDunsNumber().equals(id)).map(ContractsTransactionData::getContractingAgencyName).collect(Collectors.toList());
+			// contractAgencyName = contractAgencyName.stream().filter( distinctByKey(p
+			// ->p.toString()) ).collect(Collectors.toList());
+
+			// generate Response
+			vendorList = vendorList.stream().limit(1).collect(Collectors.toList());
+			Map<String, Object> response = new HashMap<>();
+			response.put("vendors", vendorList);
+			// response.put("agencyName", contractAgencyName);
+			response.put("totalAward", countTotalAwards.get(id));
+
+			vendorList = null;
+			return new ResponseEntity<>(response, HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	// rating list based on duns number
+	// ---------------------------------------------------------------------------------------
+	@GetMapping("/vendor/rating/{id}")
+	public ResponseEntity<Map<String, Object>> getVendorRating(@PathVariable Integer id) {
+		try {
+
+			String vendorDunsNumberStr = Integer.toString(id);
+			ratingList = opportunityVendorsPpRepository.findByEntityId(vendorDunsNumberStr);
+
+			// generate Response
+			Map<String, Object> response = new HashMap<>();
+			response.put("rating", ratingList);
+			ratingList = null;
+			return new ResponseEntity<>(response, HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	
-	   
-	   
+	//naics and  psc top  5 ---------------------------------------------------------------------
+	
+	@GetMapping("/vendor/top/{id}")
+	public ResponseEntity<Map<String, Object>> getNAICSPSC(@PathVariable Integer id) {
+
+		try {
+			vendorList = null ;
+			   vendorList = contractsDataAggregatedByVendorNaicsPscRepository.findByVendorDunsNumber(id) ;
+		      // fetching naics data to vendor
+				
+				  List<String> naicsCodeList= vendorList.parallelStream().map(
+				  ContractsDataAggregatedByVendorNaicsPsc::getNaicsCode).distinct().collect(
+				  Collectors.toList());
+					  naicsCodeList.forEach(naicsCode ->{
+					  naicsCodeDataList= naicsCodeDataRepository.findByNaicsCode(naicsCode) ;
+					  naicsCodeDataListAll.addAll(naicsCodeDataList);
+					  naicsCodeDataListAll =naicsCodeDataListAll.stream().filter( distinctByKey(n ->n.getNaicsCode())).limit(5).collect(Collectors.toList());
+					  }) ;
+					 
+		      //  ProductServiceCodeData  
+				  List<String> productServiceCodeList= vendorList.parallelStream().map(
+				  ContractsDataAggregatedByVendorNaicsPsc::getProductOrServiceCode).distinct().
+				  collect(Collectors.toList());
+					  productServiceCodeList.forEach(productServiceCode -> {
+					  productServiceCodeDataList = productServiceCodeDataRepository.findByPscCode(productServiceCode) ;
+					  pscCodeDataListAll.addAll(productServiceCodeDataList); 
+					  pscCodeDataListAll = pscCodeDataListAll.stream().filter( distinctByKey(p ->p.getPscCode())).limit(5).collect(Collectors.toList());
+					  
+					  });
+					 
+		
+			
+			Map<String, Object> response = new HashMap<>();
+	
+			  response.put("naics", naicsCodeDataListAll);
+		      response.put("psc", pscCodeDataListAll);
+			vendorList = null;
+			return new ResponseEntity<>(response, HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
+	
+
+	// Utility function
+	public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
+		Map<Object, Boolean> map = new ConcurrentHashMap<>();
+		return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+	}
+
 }

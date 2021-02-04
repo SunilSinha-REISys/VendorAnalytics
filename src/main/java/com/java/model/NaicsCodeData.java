@@ -1,7 +1,7 @@
 package com.java.model;
 
-import java.sql.Timestamp;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
