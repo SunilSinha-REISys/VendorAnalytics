@@ -69,6 +69,21 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 
 			</plugin>
+			
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>2.6.0</version>
+				<configuration>
+					<to>
+						<image>registry.hub.docker.com/sinhasunil3/vendor-analytics</image>
+					</to>
+				</configuration>
+			</plugin>
 		</plugins>
 
 		<finalName>vendor-analytics</finalName>

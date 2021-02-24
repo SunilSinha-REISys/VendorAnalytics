@@ -1,5 +1,7 @@
 package com.java.model;
 
+import java.sql.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -86,6 +88,9 @@ public class ContractsTransactionData {
     private double dollarsObligated;
     @Column
     private  Integer numberOfActions;
+    
+    @Column
+    private Date ultimateCompletionDate ;
     
     
     @JsonInclude()
@@ -284,6 +289,14 @@ public class ContractsTransactionData {
 	public void setNumberOfActions(Integer numberOfActions) {
 		this.numberOfActions = numberOfActions;
 	}
+	
+	
+	public Date getUltimateCompletionDate() {
+		return ultimateCompletionDate;
+	}
+	public void setUltimateCompletionDate(Date ultimateCompletionDate) {
+		this.ultimateCompletionDate = ultimateCompletionDate;
+	}
 	public ContractsTransactionData() {}
 	public ContractsTransactionData(long awardIdvId, String agencyCode, String piid, String modificationNumber,
 			Integer transactionNumber, Integer vendorDunsNumber, String vendorName, Integer naicsCode,
@@ -294,7 +307,7 @@ public class ContractsTransactionData {
 			String typeOfSetAsideDescription, String organizationalType, String nationalInterestDescription,
 			String vendorExceptiionDesc, String vendorAddressLine_1, String vendorAddressCity,
 			String vendorAddressStateName, String vendorAddressZipCode, double dollarsObligated,
-			Integer numberOfActions, double averageRating) {
+			Integer numberOfActions, double averageRating ,Date ultimateCompletionDate) {
 		super();
 		this.awardIdvId = awardIdvId;
 		this.agencyCode = agencyCode;
@@ -329,6 +342,7 @@ public class ContractsTransactionData {
 		this.dollarsObligated = dollarsObligated;
 		this.numberOfActions = numberOfActions;
 		this.averageRating = averageRating;
+		this.ultimateCompletionDate = ultimateCompletionDate ;
 	}
 	public double getAverageRating() {
 		return averageRating;

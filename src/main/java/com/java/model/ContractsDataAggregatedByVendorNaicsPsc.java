@@ -15,10 +15,9 @@ import javax.persistence.Table;
 
 public class ContractsDataAggregatedByVendorNaicsPsc {
 	
-	 @Id
+	    @Id
 		@GeneratedValue(strategy= GenerationType.IDENTITY)
 		private Integer id;
-	 
 	    @Column
 	    private Integer vendorDunsNumber;
 	   @Column
